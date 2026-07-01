@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembayaran - Matcha Oishi</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="pay-bg-clean">
+
+<header>
+    <h1>Selesaikan Pembayaran Anda</h1>
+    <p>Sedikit lagi untuk menikmati kesegaran Matcha Oishi pilihanmu</p>
+</header>
+
+<nav>
+    <a href="indeks.html">Beranda</a>
+    <a href="menu.html">Menu Kami</a>
+    <a href="tentang.html">Tentang</a>
+    <a href="kontak.html">Kontak</a>
+</nav>
+
+<main class="pay-wrapper">
+    <div class="pay-grid">
+        
+        <!-- Sisi Kiri: Ringkasan Pesanan -->
+        <section class="pay-card">
+            <h3>Ringkasan Pesanan</h3>
+            <div id="payment-summary-list">
+                <!-- Diisi otomatis oleh JavaScript -->
+            </div>
+            <div class="pay-hr"></div>
+            <div class="pay-total-row">
+                <span>Total Bayar:</span>
+                <strong id="payment-grand-total">Rp 0</strong>
+            </div>
+        </section>
+
+        <!-- Sisi Kanan: Form Pilihan Metode Pembayaran -->
+        <section class="pay-card">
+            <h3>Metode Pembayaran</h3>
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">Silakan pilih salah satu metode pembayaran di bawah ini:</p>
+            
+            <form id="paymentForm" onsubmit="prosesPembayaran(event)">
+                <div class="pay-method-group">
+                    <label class="pay-method-item">
+                        <input type="radio" name="paymentMethod" value="Transfer Bank" required>
+                        <div class="pay-method-text">
+                            <span class="pay-method-title">Transfer Bank (BCA / Mandiri)</span>
+                            <span class="pay-method-desc">No. Rek: 123-4567-890 a.n Matcha Oishi</span>
+                        </div>
+                    </label>
+
+                    <label class="pay-method-item">
+                        <input type="radio" name="paymentMethod" value="E-Wallet">
+                        <div class="pay-method-text">
+                            <span class="pay-method-title">QRIS / E-Wallet (Gopay, OVO, Dana)</span>
+                            <span class="pay-method-desc">Scan kode QR otomatis saat data diproses kelompok kami</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="pay-form-file">
+                    <label for="proofUpload">Upload Bukti Transfer (Opsional):</label>
+                    <input type="file" id="proofUpload" accept="image/*">
+                </div>
+
+                <div class="pay-btn-group">
+                    <a href="menu.html" class="pay-btn-cancel">Kembali ke Menu</a>
+                    <button type="submit" class="pay-btn-submit">Konfirmasi Pembayaran</button>
+                </div>
+            </form>
+        </section>
+
+    </div>
+</main>
+
+<footer>
+    <p>© 2026 Matcha Oishi - Project Kelompok UMKM</p>
+</footer>
+
+<!-- Memanggil script utama jika ada -->
+<script src="script.js"></script> 
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const summaryList = document.getElementById('payment-summary-list');
+        const totalContainer = document.getElementById('payment-grand-total');
+
+        // MENYELARASKAN KUNCI LOCALSTORAGE
+        // Mencari kemungkinan nama key yang kamu pakai di halaman utama
+        const rawCart = localStorage.getItem('cartData') || localStorage.getItem('cart') || localStorage.getItem('keranjang');
+        const rawTotal = localStorage.getItem('grandTotal') || localStorage.getItem('totalHarga') || localStorage.getItem('totalBayar');
+
+        let cartData = [];
+        try {
+            cartData = JSON.parse(rawCart) || [];
+        } catch (e) {
+            console.error("Gagal membaca data keranjang", e);
+        }
+
+        // Jika keranjang benar-benar kosong atau tidak terbaca
+        if (!cartData || cartData.length === 0) {
+            summaryList.innerHTML = '<p style="color:#666;">Tidak ada pesanan.</p>';
+            totalContainer.innerText = 'Rp 0';
+            return;
+        }
+
+        // Render list secara dinamis & hitung total harga agar akurat
+        summaryList.innerHTML = ''; 
+        let totalSeluruhnya = 0;
+
+        cartData.forEach(item => {
+            // Mengambil angka harga asli (menghilangkan string 'Rp' atau titik jika berupa teks)
+            let hargaSatuan = 0;
+            if (item.hargaSatuan) {
+                hargaSatuan = parseInt(item.hargaSatuan.toString().replace(/[^0-9]/g, ''));
+            } else if (item.harga) {
+                hargaSatuan = parseInt(item.harga.toString().replace(/[^0-9]/g, ''));
+            }
+
+            let quantity = parseInt(item.qty || item.quantity || 1);
+            
+            // Hitung harga total per item (Contoh: 28.000 x 2 = 56.000)
+            let totalItemHarga = hargaSatuan * quantity;
+            totalSeluruhnya += totalItemHarga;
+
+            // Tampilkan ke susunan HTML Ringkasan
+            summaryList.innerHTML += `
+                <div style="margin-bottom: 15px;">
+                    <div class="pay-summary-item">
+                        <span>${item.menu || item.namaMenu || 'Matcha Drink'} (${quantity}x)</span>
+                        <strong>Rp ${totalItemHarga.toLocaleString('id-ID')}</strong>
+                    </div>
+                    <small style="color: #666; display:block; margin-top:-5px;">${item.customRequest || item.custom || '-'}</small>
+                </div>
+            `;
+        });
+
+        // Tampilkan total akhir pembayaran
+        totalContainer.innerText = `Rp ${totalSeluruhnya.toLocaleString('id-ID')}`;
+    });
+
+    function prosesPembayaran(event) {
+        event.preventDefault();
+        alert('Terima kasih! Pembayaran Anda sedang diproses oleh tim kami.');
+        
+        // Bersihkan storage yang berkaitan dengan keranjang saja
+        const keysToRemove = ['cartData', 'cart', 'keranjang', 'grandTotal', 'totalHarga', 'totalBayar'];
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        
+        window.location.href = 'indeks.html';
+    }
+</script>
+
+</body>
+</html>

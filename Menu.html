@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Kami - Matcha Oishi</title>
+    <!-- Manggil CSS eksternal -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1>Menu Matcha Oishi</h1>
+    <p>Pilih rasa favoritmu dan temukan ketenangan di setiap tegukan</p>
+</header>
+
+<nav>
+    <a href="indeks.html">Beranda</a>
+    <a href="menu.html">Menu Kami</a>
+    <a href="tentang.html">Tentang</a>
+    <a href="kontak.html">Kontak</a>
+
+</nav>
+
+<!-- Fitur Ikon Keranjang Belanja Melayang di Kanan Bawah -->
+<div class="cart-fixed-container" onclick="toggleKeranjang()">
+    <div class="cart-icon">🛒</div>
+    <span id="cart-count">0</span>
+</div>
+
+<section class="menu-container">
+    <h2 class="menu-title">Varian Produk Terbaik</h2>
+    
+    <div class="menu-grid">
+        <!-- Produk 1 -->
+        <div class="menu-card">
+            <div class="menu-img">
+                <img src="https://www.foodandwine.com/thmb/2tI8aL1Z8hKhfV48_c8b6uWG-TQ=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Iced-Matcha-Latte-FT-RECIPE0622-2000-9c2e116d3bc54bdaacda10e62e8e0205.jpg" alt="Matcha Latte">
+            </div>
+            <div class="menu-info">
+                <h3>Matcha Latte</h3>
+                <p>Signature matcha murni dicampur susu segar yang super creamy.</p>
+                <span class="price">Rp 25.000</span>
+                <button class="btn-buy-trigger" data-nama="Matcha Latte" data-harga="25000" onclick="bukaForm(this)">Pesan Sekarang</button>
+            </div>
+        </div>
+
+        <!-- Produk 2 -->
+        <div class="menu-card">
+            <div class="menu-img">
+                <img src="https://tb-static.uber.com/prod/image-proc/processed_images/b65a4ed4e31bd1d02f04fd7c89ebd372/c67fc65e9b4e16a553eb7574fba090f1.jpeg" alt="Brown Sugar Matcha">
+            </div>
+            <div class="menu-info">
+                <h3>Brown Sugar Matcha</h3>
+                <p>Matcha otentik dengan manis legit dari gula aren asli pilihan.</p>
+                <span class="price">Rp 28.000</span>
+                <button class="btn-buy-trigger" data-nama="Brown Sugar Matcha" data-harga="28000" onclick="bukaForm(this)">Pesan Sekarang</button>
+            </div>
+        </div>
+
+        <!-- Produk 3 -->
+        <div class="menu-card">
+            <div class="menu-img">
+                <img src="https://storage.cornercoffeestore.com/2021/08/matcha-frappe_Atsushi-Hirao_Shutterstock.jpg" alt="Matcha Frappe">
+            </div>
+            <div class="menu-info">
+                <h3>Matcha Frappe</h3>
+                <p>Matcha dingin yang di-blend halus dengan topping whip cream.</p>
+                <span class="price">Rp 30.000</span>
+                <button class="btn-buy-trigger" data-nama="Matcha Frappe" data-harga="30000" onclick="bukaForm(this)">Pesan Sekarang</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MODAL 1: Form Pengisian Data Diri / Edit Pesanan -->
+<div id="formModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="tutupForm()">&times;</span>
+        <h3 class="modal-title" id="modalFormTitle">Data Diri Pemesan</h3>
+        <p>Menu Terpilih: <strong id="nama-produk-terpilih" class="highlight-text">-</strong></p>
+        
+        <form id="orderForm" onsubmit="simpanDataPesanan(event)">
+            <input type="hidden" id="editIndex" value="">
+
+            <div class="form-group">
+                <label for="customerName">Nama Lengkap:</label>
+                <input type="text" id="customerName" required placeholder="Masukkan nama Anda">
+            </div>
+            <div class="form-group">
+                <label for="customerQty">Jumlah Porsi (Qty):</label>
+                <input type="number" id="customerQty" min="1" value="1" required>
+            </div>
+            
+            <div class="form-group" style="margin-top: 12px;">
+                <label for="iceLevel">Ice Level:</label>
+                <select id="iceLevel" required>
+                    <option value="100%">100% (Normal Ice)</option>
+                    <option value="75%">75% (Less Ice)</option>
+                    <option value="50%">50% (Half Ice)</option>
+                    <option value="25%">25% (Low Ice)</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-top: 12px;">
+                <label for="sugarLevel">Sugar Level:</label>
+                <select id="sugarLevel" required>
+                    <option value="100%">100% (Normal Sugar)</option>
+                    <option value="75%">75% (Less Sugar)</option>
+                    <option value="50%">50% (Half Sugar)</option>
+                    <option value="25%">25% (Low Sugar)</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-submit-modal" id="btnSubmitText" style="margin-top: 15px;">Pesan Sekarang</button>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL 2: Tabel Keranjang Belanja -->
+<div id="cartModal" class="modal">
+    <div class="modal-content large-modal">
+        <span class="close-btn" onclick="toggleKeranjang()">&times;</span>
+        <h3 class="modal-title">Keranjang Belanja Anda</h3>
+        
+        <table class="matcha-table">
+            <thead>
+                <tr>
+                    <th>Nama Pemesan</th>
+                    <th>Menu</th>
+                    <th>Custom Request</th>
+                    <th>Qty</th>
+                    <th>Harga Satuan</th>
+                    <th>Total Harga</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="cart-table-body">
+                <!-- Baris tabel diproduksi dinamis dari JavaScript -->
+            </tbody>
+        </table>
+        
+        <div class="cart-footer-container">
+            <div class="total-pembayaran" style="margin-top: 0; text-align: left;">
+                <h4>Total Bayar: <span id="grand-total">Rp 0</span></h4>
+            </div>
+            <!-- Mengubah button menjadi tag 'a' agar langsung mengarah ke payment.html -->
+            <a href="payment.html" class="btn-checkout" id="btnCheckout" style="text-decoration: none; display: inline-block; text-align: center;">Lanjut ke Pembayaran</a>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>© 2026 Matcha Oishi - Project Kelompok UMKM</p>
+</footer>
+
+<!-- PANGGIL JAVASCRIPT EKSTERNAL DI SINI -->
+<script src="script.js"></script>
+
+</body>
+</html>
